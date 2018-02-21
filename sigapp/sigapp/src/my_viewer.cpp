@@ -49,54 +49,46 @@ void MyViewer::add_model ( SnShape* s, GsVec p )
 
 void MyViewer::add_clockModel(SnShape* s, GsVec p, float x = 0.0f, float y= 0.0f, float z=0.0f) {
 
-	SnManipulator* manip = new SnManipulator; 
 	GsMat m; 
-	m.translation(p);
-
-	GsMat xRot; 
-	GsMat yRot; 
-	GsMat zRot;
-
-	xRot.rotx(x);
-	xRot.roty(y);
-	xRot.rotz(z);
-
-	//m.mult(m, xRot);
-	//m.mult(m, yRot);
-	m.mult(m, zRot); 
-
-	manip->initial_mat(m);
 	
+	GsMat xRot; 
+	xRot.rotx(z); 
+	
+	SnGroup *g1 = new SnGroup; //the group containing the clock and its transformation
+	SnLines* l = new SnLines; 
+	
+	g1->separator(true);
+	g1->add(_t1 = new SnTransform);
+	g1->add(s); 
+	g1->add(l);
+	_t1->get().translation(0.0f, 0, 0);
+	_t1->get().mult(m, xRot); 
 
-	SnGroup * g = new SnGroup; 
 
-	SnLines *l = new SnLines;
-	l->color(GsColor::darkblue);
-	g->add(s);
-	g->add(l);
-	manip->child(g);
+	l->begin_polyline();
 
-	rootg()->add(manip); 
+	for (int i = 0; i <= 360; ++i) {
+		float x = cosf(GS_TORAD(float(i)));
+		float y = sinf(GS_TORAD(float(i)));
 
+		l->V.push(GsPnt(x, y, 0));
+	}
+	l->end_polyline();
+	l->line_width(5.0f);
+	l->color(GsColor::black);
 
+	rootg()->add(g1);
+	
 }
 
 void MyViewer::build_clock_scene() {
 	SnPrimitive *p; 
 
-	//Probably the shadow drop
 
 	p = new SnPrimitive(GsPrimitive::Cylinder, 1.0f, 1.0f, 0.01f);
-	p->prim().material.diffuse = GsColor::red;
-	
-	add_clockModel(p, GsVec(0.0f, 0.0f, 0.0f), 0.0f, 0.0f , GS_TORAD(-90.0f)); 
+	p->prim().material.diffuse = GsColor::red; 
+	add_clockModel(p, GsVec(0.0f, 0.0f, 0.0f), 0.0f, 0.0f , GS_TORAD(90.0f)); 
 
-
-	for (int i = 0; i <= 360; i+=30) {
-		p = new SnPrimitive(GsPrimitive::Box, 0.05f, 0.02f, 0.02f);
-		p->prim().material.diffuse = GsColor::white; 
-		add_clockModel(p, GsVec(cosf(GS_TORAD(float(i))), sinf(GS_TORAD(float(i))), 0.0f), GS_TORAD(90.0f), GS_TORAD(float(i)));
-	}
 
 }
 

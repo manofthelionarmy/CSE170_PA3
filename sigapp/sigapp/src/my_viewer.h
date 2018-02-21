@@ -12,6 +12,8 @@ class MyViewer : public WsViewer
 	enum MenuEv { EvNormals, EvAnimate, EvExit };
 	UiCheckButton* _nbut;
 	bool _animating;
+	SnTransform* _t1; 
+	SnTransform* _t2; 
    public :
 	MyViewer ( int x, int y, int w, int h, const char* l );
 	void build_ui ();
